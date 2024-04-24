@@ -84,27 +84,37 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
         #print(exons_wt)
         #print(exons_viii)
 
-    if reference_build not in egfrviiideterminer.egfr_exons:
+    if reference_build not in egfrviiideterminer.fn1_exons:
         raise Exception("unknown reference build")
 
     if read_names:
         print("sample\tread-name\twt/vIII-status"+dataset_suffix)
     else:
-        print("sample\twt-reads"+dataset_suffix+"\tvIII-reads"+dataset_suffix)
+        print("sample\twt reads [24 -> 26]" + dataset_suffix + 
+                    "\tsv 7B89 reads [24 -> 25]" + dataset_suffix + 
+                    "\tsv 7B89 reads [25 -> 26]" + dataset_suffix + 
+                    "\tsv 7B89 reads [24 -> 25 -> 26]" + dataset_suffix +
+                    "\tdiscrepant reads")
     
     for _ in tqdm(input_bam):
         if not spliced_reads_only:
-            stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal, include_duplicates, exons_wt, exons_viii)
+            stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates, exons_wt, exons_viii)
+            print(stats)
         else:
-            stats = egfrviiideterminer.extract_viii_reads_based_on_sjs(_, egfrviiideterminer.egfr_exons[reference_build], include_interchromosomal, include_duplicates)
+            stats = egfrviiideterminer.extract_viii_reads_based_on_sjs(_, egfrviiideterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
         
         if read_names:
-            for readname in sorted(stats['wt']):
-                print(_ + "\t" + readname + "\twt")
-            for readname in sorted(stats['vIII']):
-                print(_ + "\t" + readname + "\tvIII")
+            for key in sorted(stats.keys()):
+                for readname in sorted(stats[key]):
+                    print(_ + "\t" + readname + "\t" + key)
+
         else:
-            print(_ + "\t" + str(len(stats['wt'])) + "\t" + str(len(stats['vIII'])))
+            print(_ + "\t" + str(len(stats['wt [24 -> 26]'])) + "\t" +
+                             str(len(stats['sv 7B89 [24 -> 25]'])) + "\t" +
+                             str(len(stats['sv 7B89 [25 -> 26]'])) + "\t" +
+                             str(len(stats['sv 7B89 [24 -> 25 -> 26]'])) + "\t" +
+                             str(len(stats['discrepancies']))
+                            )
     
     return True
 

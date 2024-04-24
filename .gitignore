@@ -5,3 +5,5 @@ build/
 dist/
 tmp/*.py
 .eggs
+*.bam
+*.bai

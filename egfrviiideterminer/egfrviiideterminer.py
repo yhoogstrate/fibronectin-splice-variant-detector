@@ -5,7 +5,7 @@
 """[License: GNU General Public License v3 (GPLv3)]
 
     EGFR vIII determiner: counts vIII / non-vIII spliced reads in BAM files
-    Copyright (C) 2019  Youri Hoogstrate
+    Copyright (C) 2024  Youri Hoogstrate
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,31 +67,26 @@ vindt alle exon 1 reads die:
  - een deel alignen naar exons 8,9,10 etc
 """
 
-# hg19
-egfr_exons = {
-  'hg19': {
-    "1": ['chr7',55086714,55087058],
-    "2": ['chr7',55209979,55210130],
-    "3": ['chr7',55210998,55211181],
-    "4": ['chr7',55214299,55214433],
-    "5": ['chr7',55218987,55219055],
-    "6": ['chr7',55220239,55220357],
-    "7": ['chr7',55221704,55221845],
-    "8": ['chr7',55223523,55223639],
-    "9": ['chr7',55224226,55224352],
-    "10": ['chr7',55224452,55224525]
-    },
+# search window SB79
+# chr2:215,390,931-215,395,491
+
+# SV 24->26 read: A00379:269:HGTK3DSXY:3:2208:30255:24330
+# SV 24->25 read: A00379:263:HGNF2DSXY:4:2229:14552:2300
+
+# not sure for statistics?
+# SV 25->26 read: A00379:269:HGTK3DSXY:3:2362:2013:3505
+
+
+# "A00379:269:HGTK3DSXY:3:2208:30255:24330|A00379:263:HGNF2DSXY:4:2229:14552:2300|A00379:269:HGTK3DSXY:3:2362:2013:3505"
+
+
+
+fn1_exons = { # fibronectin
+  # 'hg19': { },
   'hg38': {
-    "1": ['chr7',55019021,55019365],
-    "2": ['chr7',55142286,55142437],
-    "3": ['chr7',55143305,55143488],
-    "4": ['chr7',55146606,55146740],
-    "5": ['chr7',55151294,55151362],
-    "6": ['chr7',55152546,55152664],
-    "7": ['chr7',55154011,55154152],
-    "8": ['chr7',55155830,55155946],
-    "9": ['chr7',55156533,55156659],
-    "10": ['chr7',55156759,55156832]
+    "24": ['chr2', 215394527, 215394719, "-"], # ex-24 
+    "25": ['chr2', 215392930, 215393203, "-"], # ex-25: SB79 & strand = neg
+    "26": ['chr2', 215391631, 215391814, "-"]  # ex-26
     }
 }
 
@@ -147,19 +142,12 @@ def get_splice_junction_positions(alignedsegment):
 #wt=['2','3','4','5','6','7']
 #viii=['8','9','10']
 def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates, wt, viii):
-    set_2_7 = set([])
-    set_8_10 = set([])
-    decoy = set([])
-
-    readnames = {'1': set()}
-    for _ in range(2, 10 + 1):
-        _ = str(_)
-        if _ in wt:
-            readnames[str(_)] = set_2_7
-        elif _ in viii:
-            readnames[str(_)] = set_8_10
-        else:
-            readnames[str(_)] = decoy
+    #t = {'24': {'A->B->C', 'A->B', 'A->C'}, '25': {'A->B->C', 'A->B', 'B->C'}, '26': {'A->B->C', 'A->C', 'B->C'}}
+    
+    readnames = {}
+    readnames['24'] = set([])
+    readnames['25'] = set([])
+    readnames['26'] = set([])
 
     fh = pysam.AlignmentFile(bam, "rb")
     exons = check_or_update_chr(exons, fh)
@@ -169,52 +157,97 @@ def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates,
             if read.get_overlap(exons[exon][1], exons[exon][2]):
                 if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
                     if include_duplicates or (not read.is_duplicate):
-                        readnames[exon].add(read.query_name)
+                        if exon in readnames:
+                            readnames[exon].add(read.query_name)
 
-    total_intersection = readnames['1'].intersection(set_2_7, set_8_10)
-    #if len(total_intersection) > 0:
-    for _ in total_intersection:
-        print( "Warning, read found aligned to exon1, one of the exons 2-7 AND one of the exons 8-10: " + _, file=sys.stderr)
-    readnames['1'] = readnames['1'].difference(total_intersection) # important step, imagine a read that is aligned to exon1, one of the exons 2-7 AND one of the exons 8-10, that needs to be excluded
+    wt = readnames['24'].intersection(readnames['26']).difference(readnames['25'])
+    splice_right_intron = readnames['24'].intersection(readnames['25']).difference(readnames['26'])
+    splice_left_intron = readnames['25'].intersection(readnames['26']).difference(readnames['24'])
+    splice_both_introns = readnames['24'].intersection(readnames['25'], readnames['26'])
+    print(readnames)
     
-    exon1_to_exon2_7 = readnames['1'].intersection(set_2_7)
-    exon1_to_exon8_10 = readnames['1'].intersection(set_8_10)
 
-    return {'vIII': exon1_to_exon8_10, 'wt': exon1_to_exon2_7}
+    return {'wt [24 -> 26]': wt,
+            'sv 7B89 [24 -> 25 -> 26]': splice_both_introns,
+            'sv 7B89 [24 -> 25]': splice_right_intron,
+            'sv 7B89 [25 -> 26]': splice_left_intron,
+            'discrepancies': set([])} # this does not test for discrepancies
 
 
 def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal, include_duplicates):
-    set_2 = set()# readnames of those that splice from exon 1 to 2
-    set_8 = set()# readnames of those that splice from exon 1 to 8
+    set_wt = set()# readnames of those that splice from exon 24 to 26
+    set_sv1 = set()# readnames of those that splice from exon 24 to 25
+    set_sv2 = set()# readnames of those that splice from exon 25 to 26
     
-    read_idx = {'wt': set_2, 'vIII': set_8}
+    read_idx = {'wt': set_wt, 'sv1': set_sv1, 'sv2': set_sv2}
+
+    """
     for exon in ['2', '8']:
-            if int(exon) < 8:
-                read_idx[exons[exon][1]] = set_2
-            else:
-                read_idx[exons[exon][1]] = set_8
+        if int(exon) < 8:
+            read_idx[exons[exon][1]] = set_2
+        else:
+            read_idx[exons[exon][1]] = set_8
+    """
 
     fh = pysam.AlignmentFile(bam, "rb")
     exons = check_or_update_chr(exons, fh)
 
 
-    exon = "1"
+    exon = "24"
     for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
         if read.get_overlap(exons[exon][1], exons[exon][2]):
             if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
                 if include_duplicates or (not read.is_duplicate):
                     for sj in get_splice_junction_positions(read):
-                        if sj[0] != None:
-                            if sj[0] == exons['1'][2] and sj[1] in read_idx:
-                                read_idx[sj[1]].add(read.query_name)
+                        if sj[0] != None and sj[1] == (exons['24'][1]+1):
+                            
+                            if sj[0] == exons['25'][2]:
+                                set_sv1.add(read.query_name)
+                                break
+                            elif sj[0] == exons['26'][2]:
+                                set_wt.add(read.query_name)
                                 break
 
-    #print(read_idx['vIII'])
-    #print(read_idx['wt'])
 
-    total_intersection = set_2.intersection(set_8)
+    exon = "25"
+    for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
+        if read.get_overlap(exons[exon][1], exons[exon][2]):
+            if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
+                if include_duplicates or (not read.is_duplicate):
+                    for sj in get_splice_junction_positions(read):
+                        print(exons['25'], "==", sj )
+                        if sj[0] != None:
+                            print("actual sj")
+                            if sj[1] == (exons['25'][1]+1):
+                                print("starting precisly at ex 25")
+                            
+                            if sj[0] == exons['26'][2]:
+                                print("and also spliced to 26 perfectly")
+                                set_sv2.add(read.query_name)
+                                break
 
-    for _ in total_intersection:
-        print( "Warning, read found aligned to exon1, one of the exons 2-7 AND one of the exons 8-10: " + _, file=sys.stderr)
+
+    wt = set_wt.difference(set_sv1, set_sv2)
     
-    return {'vIII': read_idx['vIII'], 'wt': read_idx['wt']}
+    splice_right_intron = set_sv1.difference(set_sv2, set_wt)
+    splice_left_intron = set_sv2.difference(set_sv1, set_wt)
+    
+    print("sv1", set_sv1)
+    print("sv2", set_sv2)
+    print("sv1|sv2", set_sv1.intersection(set_sv2))
+    print("sv1|sv2  but not wt", set_sv1.intersection(set_sv2).difference(set_wt))
+    
+    splice_both_introns = set_sv1.intersection(set_sv2).difference(set_wt)
+    
+    discrepancies = set_wt.intersection(set_sv1.union(set_sv2))
+
+    if discrepancies:
+        print( "Warning, found (n="+str(len(discrepancies))+") read with SJ's to both wt as splice variant: " + list(discrepancies)[0], file=sys.stderr)
+
+    
+    return {'wt [24 -> 26]': wt,
+            'sv 7B89 [24 -> 25 -> 26]': splice_both_introns,
+            'sv 7B89 [24 -> 25]': splice_right_intron,
+            'sv 7B89 [25 -> 26]': splice_left_intron,
+            'discrepancies': discrepancies} # this does not test for discrepancies
+

@@ -44,8 +44,8 @@ logging.basicConfig(level=logging.DEBUG, format=__log_format__, stream=sys.stder
 log = logging.getLogger(__name__)
 
 
-EXONS_WT_DEFAULT = ['2','3']
-EXONS_VIII_DEFAULT = ['8','9']
+EXONS_WT_DEFAULT = ['24','26']
+EXONS_VIII_DEFAULT = ['24','25']
 
 EXONS_WT_ALL = ['2','3','4','5','6','7']
 EXONS_VIII_ALL = ['8','9','10']
