@@ -31,41 +31,6 @@
 import sys
 import pysam
 
-"""
-Possibilities:
-
-non-split:
-[             ]       [             ]
-      [====>--------------<====]
-
-
-split-A:
-[             ]       [             ]
-           [== ....... ==>--<====]
-
-
-split-B:
-[             ]       [             ]
-  [====>---<== ....... ==]
-
-
-split-C:
-[             ]       [             ]
-           <== ....... ==]
-           [== ....... ==>
-
-EGVRvIII = splice variant van exon1 naar exon8
-
-door insert size kan dit natuurlijk ook een read van exon1 naar exon9 of misschien zelfs exon10
-
-max insert size moet dus uiteindelijk een parameter worden
-
-
-rekenkundige truc:
-vindt alle exon 1 reads die:
- - een deel alignen naar exons 2,3,4,5,6,7
- - een deel alignen naar exons 8,9,10 etc
-"""
 
 # search window SB79
 # chr2:215,390,931-215,395,491
@@ -76,8 +41,6 @@ vindt alle exon 1 reads die:
 # not sure for statistics?
 # SV 25->26 read: A00379:269:HGTK3DSXY:3:2362:2013:3505
 
-
-# "A00379:269:HGTK3DSXY:3:2208:30255:24330|A00379:263:HGNF2DSXY:4:2229:14552:2300|A00379:269:HGTK3DSXY:3:2362:2013:3505"
 
 
 
@@ -98,6 +61,7 @@ def check_or_update_chr(chrlist, pysam_handle):
             chrlist[_][0] = chrlist[_][0].replace('chr','')
 
     return chrlist
+
 
 def get_splice_junction_positions(alignedsegment):
     """
@@ -180,14 +144,6 @@ def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal, includ
     set_sv2 = set()# readnames of those that splice from exon 25 to 26
     
     read_idx = {'wt': set_wt, 'sv1': set_sv1, 'sv2': set_sv2}
-
-    """
-    for exon in ['2', '8']:
-        if int(exon) < 8:
-            read_idx[exons[exon][1]] = set_2
-        else:
-            read_idx[exons[exon][1]] = set_8
-    """
 
     fh = pysam.AlignmentFile(bam, "rb")
     exons = check_or_update_chr(exons, fh)
