@@ -4,8 +4,8 @@
 
 """[License: GNU General Public License v3 (GPLv3)]
 
-    EGFR vIII determiner: counts vIII / non-vIII spliced reads in BAM files
-    Copyright (C) 2024  Youri Hoogstrate
+    fibronectin-splice-variant-detector: counts Fibronectin (FN1) alt. splicing in BAM files
+    Copyright (C) 2024  Youri Hoogstrate, Tobias Weiss and Pim French
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 
     You can contact me via the github repository at the following url:
-    <https://github.com/yhoogstrate/egfr-v3-determiner>
+    <https://github.com/yhoogstrate/fibronectin-splice-var-determiner>
 
     You can e-mail me via 'y.hoogstrate' at the following webmail domain:
     gmail dot com

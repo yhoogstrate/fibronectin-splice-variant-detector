@@ -2,10 +2,11 @@
 # *- coding: utf-8 -*-
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 textwidth=79:
 
+
 """[License: GNU General Public License v3 (GPLv3)]
 
     EGFR vIII determiner: counts vIII / non-vIII spliced reads in BAM files
-    Copyright (C) 2019  Youri Hoogstrate
+    Copyright (C) 2024  Youri Hoogstrate
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,14 +23,14 @@
 
 
     You can contact me via the github repository at the following url:
-    <https://github.com/yhoogstrate/egfr-v3-determiner>
+    <https://github.com/yhoogstrate/fibronectin-splice-var-determiner>
 
     You can e-mail me via 'y.hoogstrate' at the following webmail domain:
     gmail dot com
 """
 
 
-import egfrviiideterminer
+import fn1splicevardeterminer
 from setuptools import setup
 
 
@@ -40,17 +41,17 @@ def get_requirements():
     return content
 
 
-setup(name="egfr-v3-determiner",
-      scripts=['bin/egfr-v3-determiner'],
-      packages=["egfrviiideterminer"],
+setup(name="fibronectin-splice-var-determiner",
+      scripts=['bin/fibronectin-splice-var-determiner'],
+      packages=["fn1splicevardeterminer"],
       test_suite="tests",
       tests_require=['nose', 'pytest', 'pytest-cov'],
       #setup_requires=['scipy', 'numpy'],
       install_requires=[get_requirements()],
-      version=egfrviiideterminer.__version__,
-      description="Free open-source tool to extract counts of spliced EGFR vIII / EGFR non-vIII (wt) reads",
-      author=egfrviiideterminer.__author__,
-      url=egfrviiideterminer.__homepage__,
+      version=fn1splicevardeterminer.__version__,
+      description="Free open-source tool to extract counts of splice variants of FN1",
+      author=fn1splicevardeterminer.__author__,
+      url=fn1splicevardeterminer.__homepage__,
       keywords=["rna-seq", "egfr", "vIII"],
       classifiers=[
           'Environment :: Console',

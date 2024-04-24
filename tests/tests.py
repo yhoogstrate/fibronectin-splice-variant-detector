@@ -4,8 +4,8 @@
 
 """[License: GNU General Public License v3 (GPLv3)]
 
-    EGFR vIII determiner: counts vIII / non-vIII spliced reads in BAM files
-    Copyright (C) 2019  Youri Hoogstrate
+    fibronectin-splice-variant-detector: counts Fibronectin (FN1) alt. splicing in BAM files
+    Copyright (C) 2024  Youri Hoogstrate, Tobias Weiss and Pim French
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 
     You can contact me via the github repository at the following url:
-    <https://github.com/yhoogstrate/egfr-v3-determiner>
+    <https://github.com/yhoogstrate/fibronectin-splice-var-determiner>
 
     You can e-mail me via 'y.hoogstrate' at the following webmail domain:
     gmail dot com
@@ -33,7 +33,7 @@ import unittest
 import os
 import pysam
 
-from egfrviiideterminer import EXONS_WT_ALL, EXONS_VIII_ALL
+from fn1splicevardeterminer import EXONS_WT_ALL, EXONS_VIII_ALL
 
 
 def sam_to_sorted_bam(sam, sorted_bam):
@@ -67,11 +67,11 @@ class Tests(unittest.TestCase):
         
         sam_to_sorted_bam(input_file_sam, input_file_bam)
         
-        from egfrviiideterminer import egfrviiideterminer
+        from fn1splicevardeterminer import fn1splicevardeterminer
         dbkey = 'hg38'
         
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL), {'vIII': {'example_01'}, 'wt': set()})
-        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(fn1splicevardeterminer.extract_viii_reads(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(fn1splicevardeterminer.extract_viii_reads_based_on_sjs(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
 
     def test_002(self):
         input_file_sam = TEST_DIR + "test_002_wt_non-spliced.sam"
@@ -79,14 +79,14 @@ class Tests(unittest.TestCase):
         
         sam_to_sorted_bam(input_file_sam, input_file_bam)
         
-        from egfrviiideterminer import egfrviiideterminer
+        from fn1splicevardeterminer import fn1splicevardeterminer
         dbkey = 'hg38'
         
         # hier moet die hem wel vinden, in wt
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL), {'vIII': set(), 'wt': {'example_002'}})
+        self.assertEqual(fn1splicevardeterminer.extract_viii_reads(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL), {'vIII': set(), 'wt': {'example_002'}})
         
         # spliced only - hier moet die hem niet vinden, in wt
-        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': set(), 'wt': {'example_002'}})
+        self.assertEqual(fn1splicevardeterminer.extract_viii_reads_based_on_sjs(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, False), {'vIII': set(), 'wt': {'example_002'}})
 
     def test_003(self):
         input_file_sam = TEST_DIR + "test_003_vIII_non_spliced.sam"
@@ -94,21 +94,21 @@ class Tests(unittest.TestCase):
         
         sam_to_sorted_bam(input_file_sam, input_file_bam)
         
-        from egfrviiideterminer import egfrviiideterminer
+        from fn1splicevardeterminer import fn1splicevardeterminer
         dbkey = 'hg19'
         
         # hier moet die hem wel vinden, in wt
-        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, True, EXONS_WT_ALL, EXONS_VIII_ALL)
+        results = fn1splicevardeterminer.extract_viii_reads(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, True, EXONS_WT_ALL, EXONS_VIII_ALL)
         self.assertEqual(len(results['vIII']), 170)
         self.assertEqual(len(results['wt']), 0)
         
         # do not allow PCR/optical duplicates
-        results = egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL)
+        results = fn1splicevardeterminer.extract_viii_reads(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL)
         self.assertEqual(len(results['vIII']), 43)
         self.assertEqual(len(results['wt']), 0)
         
         # spliced only - hier moet die hem niet vinden, in 
-        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, True)
+        results = fn1splicevardeterminer.extract_viii_reads_based_on_sjs(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, True)
         self.assertEqual(len(results['vIII']), 0)
         self.assertEqual(len(results['wt']), 0)
 
@@ -118,16 +118,16 @@ class Tests(unittest.TestCase):
         
         sam_to_sorted_bam(input_file_sam, input_file_bam)
         
-        from egfrviiideterminer import egfrviiideterminer
+        from fn1splicevardeterminer import fn1splicevardeterminer
         dbkey = 'hg19'
         
         # spliced only - hier moet die hem niet vinden, in 
-        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False)
+        results = fn1splicevardeterminer.extract_viii_reads_based_on_sjs(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, False)
         self.assertEqual(len(results['vIII']), 0)
         self.assertEqual(len(results['wt']), 0)
 
         # ook niet spliced, hier moet je hem wel in vinden
-        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], True, False)
+        results = fn1splicevardeterminer.extract_viii_reads_based_on_sjs(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], True, False)
         self.assertEqual(len(results['vIII']), 1)
         self.assertEqual(len(results['wt']), 0)
 
@@ -137,16 +137,16 @@ class Tests(unittest.TestCase):
         
         sam_to_sorted_bam(input_file_sam, input_file_bam)
         
-        from egfrviiideterminer import egfrviiideterminer
+        from fn1splicevardeterminer import fn1splicevardeterminer
         dbkey = 'hg19'
         
         # geen duplicates = niet vinden
-        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False)
+        results = fn1splicevardeterminer.extract_viii_reads_based_on_sjs(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, False)
         self.assertEqual(len(results['vIII']), 0)
         self.assertEqual(len(results['wt']), 1)
 
         # wel duplicates = wel vinden
-        results = egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, True)
+        results = fn1splicevardeterminer.extract_viii_reads_based_on_sjs(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, True)
         self.assertEqual(len(results['vIII']), 0)
         self.assertEqual(len(results['wt']), 2)
 
@@ -156,11 +156,11 @@ class Tests(unittest.TestCase):
         
         sam_to_sorted_bam(input_file_sam, input_file_bam)
         
-        from egfrviiideterminer import egfrviiideterminer
+        from fn1splicevardeterminer import fn1splicevardeterminer
         dbkey = 'hg38'
         
-        self.assertEqual(egfrviiideterminer.extract_viii_reads(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL), {'vIII': {'example_01'}, 'wt': set()})
-        self.assertEqual(egfrviiideterminer.extract_viii_reads_based_on_sjs(input_file_bam, egfrviiideterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(fn1splicevardeterminer.extract_viii_reads(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, False, EXONS_WT_ALL, EXONS_VIII_ALL), {'vIII': {'example_01'}, 'wt': set()})
+        self.assertEqual(fn1splicevardeterminer.extract_viii_reads_based_on_sjs(input_file_bam, fn1splicevardeterminer.egfr_exons[dbkey], False, False), {'vIII': {'example_01'}, 'wt': set()})
 
 
 if __name__ == '__main__':

@@ -22,14 +22,14 @@
 
 
     You can contact me via the github repository at the following url:
-    <https://github.com/yhoogstrate/egfr-v3-determiner>
+    <https://github.com/yhoogstrate/fibronectin-splice-var-determiner>
 
     You can e-mail me via 'y.hoogstrate' at the following webmail domain:
     gmail dot com
 """
 
 
-import egfrviiideterminer
+import fn1splicevardeterminer
 
 import click
 from tqdm import tqdm
@@ -49,7 +49,7 @@ def main():
 
 
 @click.command()
-@click.version_option(egfrviiideterminer.__version__ + "\n\n" + egfrviiideterminer.__license_notice__ + "\n\nCopyright (C) 2019  " + egfrviiideterminer.__author__ + ".\n\nFor more info please visit:\n" + egfrviiideterminer.__homepage__)
+@click.version_option(fn1splicevardeterminer.__version__ + "\n\n" + fn1splicevardeterminer.__license_notice__ + "\n\nCopyright (C) 2019  " + fn1splicevardeterminer.__author__ + ".\n\nFor more info please visit:\n" + fn1splicevardeterminer.__homepage__)
 @click.option("--reference-build", "-r", required=True, type=click.Choice(['hg19', 'hg38']), help="Used reference genome (needed for EGFR exon coordinates)")
 @click.option('--spliced-reads-only', "-s", is_flag=True, help="If paired end reads with an insert size longer than 801 bases can be expected, wild-type exon-1 to exon-8 covering reads can can be expected. Enabling this flag only uses spliced reads for vIII determination.")
 @click.option('--read-names', "-n", is_flag=True, help="Report all read-names instead of the read counts.")
@@ -58,11 +58,11 @@ def main():
 @click.option('--include-duplicates', "-f", is_flag=True, help="Force including duplicate reads (as marked by samtools/sambamba/picard etc. - disabled by default).")
 @click.argument('input_bam', type=click.Path(exists=True),nargs=-1)
 def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_interchromosomal, dataset_suffix, include_duplicates):
-    from egfrviiideterminer import egfrviiideterminer
+    from fn1splicevardeterminer import fn1splicevardeterminer
 
     dataset_suffix = dataset_suffix.replace("\t","").replace("\n","")
 
-    if reference_build not in egfrviiideterminer.fn1_exons:
+    if reference_build not in fn1splicevardeterminer.fn1_exons:
         raise Exception("unknown reference build")
 
     if read_names:
@@ -76,9 +76,9 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
     
     for _ in tqdm(input_bam):
         if not spliced_reads_only:
-            stats = egfrviiideterminer.extract_viii_reads(_, egfrviiideterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
+            stats = fn1splicevardeterminer.extract_viii_reads(_, fn1splicevardeterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
         else:
-            stats = egfrviiideterminer.extract_viii_reads_based_on_sjs(_, egfrviiideterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
+            stats = fn1splicevardeterminer.extract_viii_reads_based_on_sjs(_, fn1splicevardeterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
         
         if read_names:
             for key in sorted(stats.keys()):
