@@ -215,28 +215,15 @@ def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal, includ
             if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
                 if include_duplicates or (not read.is_duplicate):
                     for sj in get_splice_junction_positions(read):
-                        print(exons['25'], "==", sj )
-                        if sj[0] != None:
-                            print("actual sj")
-                            if sj[1] == (exons['25'][1]+1):
-                                print("starting precisly at ex 25")
-                            
-                            if sj[0] == exons['26'][2]:
-                                print("and also spliced to 26 perfectly")
-                                set_sv2.add(read.query_name)
-                                break
+                        if sj[0] != None and sj[1] == (exons['25'][1]+1) and sj[0] == exons['26'][2]:
+                            set_sv2.add(read.query_name)
+                            break
 
 
     wt = set_wt.difference(set_sv1, set_sv2)
     
     splice_right_intron = set_sv1.difference(set_sv2, set_wt)
     splice_left_intron = set_sv2.difference(set_sv1, set_wt)
-    
-    print("sv1", set_sv1)
-    print("sv2", set_sv2)
-    print("sv1|sv2", set_sv1.intersection(set_sv2))
-    print("sv1|sv2  but not wt", set_sv1.intersection(set_sv2).difference(set_wt))
-    
     splice_both_introns = set_sv1.intersection(set_sv2).difference(set_wt)
     
     discrepancies = set_wt.intersection(set_sv1.union(set_sv2))

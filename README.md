@@ -1,4 +1,4 @@
-# egfr-v3-determiner #
+# fibronectin-splice-variant-detector #
 
 EGFRvIII is the most common mutation found in the EGFR gene in glioblastomma.
 It originates from a genomic deletion or multiple inversion resulting in the
@@ -64,15 +64,15 @@ Thank you in advance, Youri
 ## Installation ##
 
 ```
-git clone https://github.com/yhoogstrate/egfr-v3-determiner.git
+git clone https://github.com/yhoogstrate/fibronectin-splice-variant-detector.git
 cd egfr-v3-determiner
 
 virtualenv -p python3 .venv
 source .venv/bin/activate
 
-python setup.py install
+pip install .
 
-egfr-v3-determiner --help
+fibronectin-splice-variant-detector --help
 
 nosetests tests/*.py
 ```

@@ -4,8 +4,8 @@
 
 """[License: GNU General Public License v3 (GPLv3)]
 
-    EGFR vIII determiner: counts vIII / non-vIII spliced reads in BAM files
-    Copyright (C) 2019  Youri Hoogstrate
+    fibronectin-splice-variant-detector: counts Fibronectin (FN1) alt. splicing in BAM files
+    Copyright (C) 2024  Youri Hoogstrate, Tobias Weiss and Pim French
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 
     You can contact me via the github repository at the following url:
-    <https://github.com/yhoogstrate/egfr-v3-determiner>
+    <https://github.com/yhoogstrate/fibronectin-splice-variant-detector>
 
     You can e-mail me via 'y.hoogstrate' at the following webmail domain:
     gmail dot com
@@ -32,23 +32,14 @@
 import logging
 import sys
 
-__version_info__ = ('0', '7', '4')
+__version_info__ = ('1', '0', '0')
 __version__ = '.'.join(__version_info__) if (len(__version_info__) == 3) else '.'.join(__version_info__[0:3]) + "-" + __version_info__[3]
 __author__ = 'Youri Hoogstrate'
-__homepage__ = 'https://github.com/yhoogstrate/egfr-v3-determiner'
+__homepage__ = 'https://github.com/yhoogstrate/fibronectin-splice-variant-detector'
 __license__ = 'GNU General Public License v3 (GPLv3)'
 __license_notice__ = 'License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.'
 
 __log_format__ = "[%(filename)s:%(lineno)s - %(funcName)s()] %(asctime)s - %(levelname)s - %(message)s"
 logging.basicConfig(level=logging.DEBUG, format=__log_format__, stream=sys.stderr)  # bioconda seems to crash on stdout here..
 log = logging.getLogger(__name__)
-
-
-EXONS_WT_DEFAULT = ['24','26']
-EXONS_VIII_DEFAULT = ['24','25']
-
-EXONS_WT_ALL = ['2','3','4','5','6','7']
-EXONS_VIII_ALL = ['8','9','10']
-
-
 
