@@ -77,10 +77,10 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
               "7B89: discrepant reads" + "\t"
               
               
-              "11A12: wt reads [24 -> 26]" + dataset_suffix + "\t" +
-              "11A12: sv reads [24 -> 25]" + dataset_suffix + "\t" +
-              "11A12: sv reads [25 -> 26]" + dataset_suffix + "\t" +
-              "11A12: sv reads [24 -> 25 -> 26]" + dataset_suffix + "\t" +
+              "11A12: wt reads [31 -> 33]" + dataset_suffix + "\t" +
+              "11A12: sv reads [31 -> 32]" + dataset_suffix + "\t" +
+              "11A12: sv reads [31 -> 32]" + dataset_suffix + "\t" +
+              "11A12: sv reads [31 -> 32 -> 33]" + dataset_suffix + "\t" +
               "11A12: discrepant reads" )
     
     for _ in tqdm(input_bam):
@@ -92,11 +92,11 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
             stats_11A12 = fn1splicevardeterminer.extract_FN1_11A12_sv_reads_based_on_sjs(_, fn1splicevardeterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
         
         if read_names:
-            for key in sorted(stats_7B89.keys()):
+            for key in ["7B89: wt read [24 -> 26]", "7B89: sv read [24 -> 25]", "7B89: sv read [25 -> 26]", "7B89: sv read [24 -> 25 -> 26]", "7B89: discrepant read"]:
                 for readname in sorted(stats_7B89[key]):
                     print(_ + "\t" + readname + "\t" + key)
 
-            for key in sorted(stats_11A12.keys()):
+            for key in ["11A12: wt read [31 -> 33]", "11A12: sv read [31 -> 32]", "11A12: sv read [31 -> 32]", "11A12: sv read [31 -> 32 -> 33]", "11A12: discrepant read"]:
                 for readname in sorted(stats_11A12[key]):
                     print(_ + "\t" + readname + "\t" + key)
 
