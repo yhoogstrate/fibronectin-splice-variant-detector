@@ -68,29 +68,33 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
     if read_names:
         print("sample\tread-name\twt/splice-variant-status"+dataset_suffix)
     else:
-        print("sample\twt reads [24 -> 26]" + dataset_suffix + 
-                    "\tsv 7B89 reads [24 -> 25]" + dataset_suffix + 
-                    "\tsv 7B89 reads [25 -> 26]" + dataset_suffix + 
-                    "\tsv 7B89 reads [24 -> 25 -> 26]" + dataset_suffix +
-                    "\tdiscrepant reads")
+        print("sample\t" +
+        
+              "7B89: wt reads [24 -> 26]" + dataset_suffix + "\t" +
+              "7B89: sv reads [24 -> 25]" + dataset_suffix + "\t" +
+              "7B89: sv reads [25 -> 26]" + dataset_suffix + "\t" +
+              "7B89: sv reads [24 -> 25 -> 26]" + dataset_suffix + "\t" +
+              "7B89: discrepant reads")
     
     for _ in tqdm(input_bam):
         if not spliced_reads_only:
-            stats = fn1splicevardeterminer.extract_FN1_SB79_sv_reads(_, fn1splicevardeterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
+            stats_7B89 = fn1splicevardeterminer.extract_FN1_7B89_sv_reads(_, fn1splicevardeterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
+            stats_11A12 = fn1splicevardeterminer.extract_FN1_11A12_sv_reads(_, fn1splicevardeterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
         else:
-            stats = fn1splicevardeterminer.extract_FN1_SB79_sv_reads_based_on_sjs(_, fn1splicevardeterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
+            stats_7B89 = fn1splicevardeterminer.extract_FN1_7B89_sv_reads_based_on_sjs(_, fn1splicevardeterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
+            stats_11A12 = fn1splicevardeterminer.extract_FN1_11A12_sv_reads_based_on_sjs(_, fn1splicevardeterminer.fn1_exons[reference_build], include_interchromosomal, include_duplicates)
         
         if read_names:
-            for key in sorted(stats.keys()):
-                for readname in sorted(stats[key]):
+            for key in sorted(stats_7B89.keys()):
+                for readname in sorted(stats_7B89[key]):
                     print(_ + "\t" + readname + "\t" + key)
 
         else:
-            print(_ + "\t" + str(len(stats['wt [24 -> 26]'])) + "\t" +
-                             str(len(stats['sv 7B89 [24 -> 25]'])) + "\t" +
-                             str(len(stats['sv 7B89 [25 -> 26]'])) + "\t" +
-                             str(len(stats['sv 7B89 [24 -> 25 -> 26]'])) + "\t" +
-                             str(len(stats['discrepancies']))
+            print(_ + "\t" + str(len(stats_7B89['7B89: wt read [24 -> 26]'])) + "\t" +
+                             str(len(stats_7B89['7B89: sv read [24 -> 25]'])) + "\t" +
+                             str(len(stats_7B89['7B89: sv read [25 -> 26]'])) + "\t" +
+                             str(len(stats_7B89['7B89: sv read [24 -> 25 -> 26]'])) + "\t" +
+                             str(len(stats_7B89['7B89: discrepant read']))
                             )
     
     return True

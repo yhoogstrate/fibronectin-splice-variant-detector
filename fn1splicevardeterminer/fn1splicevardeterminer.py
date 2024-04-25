@@ -32,7 +32,7 @@ import sys
 import pysam
 
 
-# search window SB79
+# search window 7B89
 # chr2:215,390,931-215,395,491
 
 # SV 24->26 read: A00379:269:HGTK3DSXY:3:2208:30255:24330
@@ -48,12 +48,12 @@ fn1_exons = { # fibronectin
   # 'hg19': { },
   'hg38': {
     "24": ['chr2', 215394528, 215394719, "-"], # ex-24 
-    "25": ['chr2', 215392931, 215393203, "-"], # ex-25: SB79 & strand = neg
+    "25": ['chr2', 215392931, 215393203, "-"], # ex-25: 7B89 & strand = neg
     "26": ['chr2', 215391632, 215391814, "-"], # ex-26
  
-    "31": ["chr2", 215382211, 215382326, "-"], # ex-31
-    "32": ["chr2", 215380810, 215381076, "-"], # ex-32: 11A12
-    "33": ["chr2", 215379129, 215379317, "-"]  # ex-33
+    "31": ["chr2", 215382212, 215382325, "-"], # ex-31
+    "32": ["chr2", 215380811, 215381080, "-"], # ex-32: 11A12
+    "33": ["chr2", 215379130, 215379317, "-"]  # ex-33
     }
 }
 
@@ -107,13 +107,9 @@ def get_splice_junction_positions(alignedsegment):
     return out
 
 
-def extract_FN1_SB79_sv_reads(bam, exons, include_interchromosomal, include_duplicates):
+def extract_FN1_7B89_sv_reads(bam, exons, include_interchromosomal, include_duplicates):
     #t = {'24': {'A->B->C', 'A->B', 'A->C'}, '25': {'A->B->C', 'A->B', 'B->C'}, '26': {'A->B->C', 'A->C', 'B->C'}}
-    
-    readnames = {}
-    readnames['24'] = set([])
-    readnames['25'] = set([])
-    readnames['26'] = set([])
+    readnames = {'24': set([]), '25': set([]), '26': set([])}
 
     fh = pysam.AlignmentFile(bam, "rb")
     exons = check_or_update_chr(exons, fh)
@@ -132,23 +128,47 @@ def extract_FN1_SB79_sv_reads(bam, exons, include_interchromosomal, include_dupl
     splice_both_introns = readnames['24'].intersection(readnames['25'], readnames['26'])
     
 
-    return {'wt [24 -> 26]': wt,
-            'sv 7B89 [24 -> 25 -> 26]': splice_both_introns,
-            'sv 7B89 [24 -> 25]': splice_right_intron,
-            'sv 7B89 [25 -> 26]': splice_left_intron,
-            'discrepancies': set([])} # this does not test for discrepancies
+    return {'7B89: wt read [24 -> 26]': wt,
+            '7B89: sv read [24 -> 25 -> 26]': splice_both_introns,
+            '7B89: sv read [24 -> 25]': splice_right_intron,
+            '7B89: sv read [25 -> 26]': splice_left_intron,
+            '7B89: discrepant read': set([])} # this does not test for discrepancies
 
 
-def extract_FN1_SB79_sv_reads_based_on_sjs(bam, exons, include_interchromosomal, include_duplicates):
-    set_wt = set()# readnames of those that splice from exon 24 to 26
-    set_sv1 = set()# readnames of those that splice from exon 24 to 25
-    set_sv2 = set()# readnames of those that splice from exon 25 to 26
-    
-    read_idx = {'wt': set_wt, 'sv1': set_sv1, 'sv2': set_sv2}
+def extract_FN1_11A12_sv_reads(bam, exons, include_interchromosomal, include_duplicates):
+    readnames = {'31': set([]), '32': set([]), '33': set([])}
 
     fh = pysam.AlignmentFile(bam, "rb")
     exons = check_or_update_chr(exons, fh)
 
+    for exon in exons:
+        for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
+            if read.get_overlap(exons[exon][1], exons[exon][2]):
+                if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
+                    if include_duplicates or (not read.is_duplicate):
+                        if exon in readnames:
+                            readnames[exon].add(read.query_name)
+
+    wt = readnames['31'].intersection(readnames['33']).difference(readnames['32'])
+    splice_right_intron = readnames['31'].intersection(readnames['32']).difference(readnames['33'])
+    splice_left_intron = readnames['32'].intersection(readnames['33']).difference(readnames['31'])
+    splice_both_introns = readnames['31'].intersection(readnames['32'], readnames['33'])
+    
+
+    return {'11A12: wt read [31 -> 33]': wt,
+            '11A12: sv read [31 -> 32 -> 33]': splice_both_introns,
+            '11A12: sv read [31 -> 32]': splice_right_intron,
+            '11A12: sv read [32 -> 33]': splice_left_intron,
+            '11A12: discrepant read': set([])} # this does not test for discrepancies
+
+
+def extract_FN1_7B89_sv_reads_based_on_sjs(bam, exons, include_interchromosomal, include_duplicates):
+    set_wt = set()# readnames of those that splice from exon 24 to 26
+    set_sv1 = set()# readnames of those that splice from exon 24 to 25
+    set_sv2 = set()# readnames of those that splice from exon 25 to 26
+    
+    fh = pysam.AlignmentFile(bam, "rb")
+    exons = check_or_update_chr(exons, fh)
 
     exon = "24"
     for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
@@ -189,9 +209,67 @@ def extract_FN1_SB79_sv_reads_based_on_sjs(bam, exons, include_interchromosomal,
         print( "Warning, found (n="+str(len(discrepancies))+") read with SJ's to both wt as splice variant: " + list(discrepancies)[0], file=sys.stderr)
 
     
-    return {'wt [24 -> 26]': wt,
-            'sv 7B89 [24 -> 25 -> 26]': splice_both_introns,
-            'sv 7B89 [24 -> 25]': splice_right_intron,
-            'sv 7B89 [25 -> 26]': splice_left_intron,
-            'discrepancies': discrepancies} # this does not test for discrepancies
+    return {'7B89: wt read [24 -> 26]': wt,
+            '7B89: sv read [24 -> 25 -> 26]': splice_both_introns,
+            '7B89: sv read [24 -> 25]': splice_right_intron,
+            '7B89: sv read [25 -> 26]': splice_left_intron,
+            '7B89: discrepant read': discrepancies} # this does not test for discrepancies
+
+
+
+def extract_FN1_11A12_sv_reads_based_on_sjs(bam, exons, include_interchromosomal, include_duplicates):
+    set_wt = set()# readnames of those that splice from exon 31 to 33
+    set_sv1 = set()# readnames of those that splice from exon 31 to 32
+    set_sv2 = set()# readnames of those that splice from exon 32 to 33
+    
+    fh = pysam.AlignmentFile(bam, "rb")
+    exons = check_or_update_chr(exons, fh)
+
+    exon = "31"
+    for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
+        if read.get_overlap(exons[exon][1], exons[exon][2]):
+            if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
+                if include_duplicates or (not read.is_duplicate):
+                    for sj in get_splice_junction_positions(read):
+                        if sj[0] != None and sj[1] == (exons['31'][1]):
+                            
+                            if sj[0] == exons['32'][2]:
+                                set_sv1.add(read.query_name)
+                                break
+                            elif sj[0] == exons['33'][2]:
+                                set_wt.add(read.query_name)
+                                break
+
+
+    exon = "32"
+    for read in fh.fetch(exons[exon][0], exons[exon][1], exons[exon][2]):
+        if read.get_overlap(exons[exon][1], exons[exon][2]):
+            if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
+                if include_duplicates or (not read.is_duplicate):
+                    for sj in get_splice_junction_positions(read):
+                        if sj[0] != None and sj[1] == (exons['32'][1]) and sj[0] == exons['33'][2]:
+                            set_sv2.add(read.query_name)
+                            break
+
+
+    wt = set_wt.difference(set_sv1, set_sv2)
+    
+    splice_right_intron = set_sv1.difference(set_sv2, set_wt)
+    splice_left_intron = set_sv2.difference(set_sv1, set_wt)
+    splice_both_introns = set_sv1.intersection(set_sv2).difference(set_wt)
+    
+    discrepancies = set_wt.intersection(set_sv1.union(set_sv2))
+
+    if discrepancies:
+        print( "Warning, found (n="+str(len(discrepancies))+") read with SJ's to both wt as splice variant: " + list(discrepancies)[0], file=sys.stderr)
+
+    
+    return {'11A12: wt read [31 -> 33]': wt,
+            '11A12: sv read [31 -> 32 -> 33]': splice_both_introns,
+            '11A12: sv read [31 -> 32]': splice_right_intron,
+            '11A12: sv read [32 -> 33]': splice_left_intron,
+            '11A12: discrepant read': discrepancies} # this does not test for discrepancies
+
+
+
 

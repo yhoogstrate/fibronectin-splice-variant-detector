@@ -1,6 +1,6 @@
 sample	read-name	wt/splice-variant-status
-tmp/test_001.bam	discrepant_read	sv 7B89 [24 -> 25 -> 26]
-tmp/test_001.bam	e24_to_25_and_e25_to_e26_splice_variant_read	sv 7B89 [24 -> 25 -> 26]
-tmp/test_001.bam	e24_to_e25_splice_variant_read	sv 7B89 [24 -> 25]
-tmp/test_001.bam	e25_to_e26_splice_variant_read	sv 7B89 [25 -> 26]
-tmp/test_001.bam	wiltype_read	wt [24 -> 26]
+tmp/test_001.bam	sv_7B89_discrepant_read	7B89: sv read [24 -> 25 -> 26]
+tmp/test_001.bam	sv_7B89_sv_read_e24_e25__e25_e26	7B89: sv read [24 -> 25 -> 26]
+tmp/test_001.bam	sv_7B89_sv_read_e24_e25	7B89: sv read [24 -> 25]
+tmp/test_001.bam	sv_7B89_sv_read_e25_e26	7B89: sv read [25 -> 26]
+tmp/test_001.bam	sv_7B89_wt_read	7B89: wt read [24 -> 26]
