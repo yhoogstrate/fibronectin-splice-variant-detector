@@ -105,7 +105,7 @@ def get_splice_junction_positions(alignedsegment):
 
 #wt=['2','3','4','5','6','7']
 #viii=['8','9','10']
-def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates, wt, viii):
+def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates):
     #t = {'24': {'A->B->C', 'A->B', 'A->C'}, '25': {'A->B->C', 'A->B', 'B->C'}, '26': {'A->B->C', 'A->C', 'B->C'}}
     
     readnames = {}

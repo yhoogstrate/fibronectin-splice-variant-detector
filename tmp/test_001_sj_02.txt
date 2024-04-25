@@ -1,0 +1,2 @@
+sample	wt reads [24 -> 26]	sv 7B89 reads [24 -> 25]	sv 7B89 reads [25 -> 26]	sv 7B89 reads [24 -> 25 -> 26]	discrepant reads
+tests/data/test_001.bam	1	1	1	1	1
