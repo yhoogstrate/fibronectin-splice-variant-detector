@@ -1,2 +1,2 @@
-sample	7B89: wt reads [24 -> 26]	7B89: sv reads [24 -> 25]	7B89: sv reads [25 -> 26]	7B89: sv reads [24 -> 25 -> 26]	7B89: discrepant reads
-tmp/test_001.bam	1	1	1	2	0
+sample	7B89: wt reads [24 -> 26]	7B89: sv reads [24 -> 25]	7B89: sv reads [25 -> 26]	7B89: sv reads [24 -> 25 -> 26]	7B89: discrepant reads	11A12: wt reads [24 -> 26]	11A12: sv reads [24 -> 25]	11A12: sv reads [25 -> 26]	11A12: sv reads [24 -> 25 -> 26]	11A12: discrepant reads
+tmp/test_001.bam	1	1	1	2	0	1	1	1	0	0

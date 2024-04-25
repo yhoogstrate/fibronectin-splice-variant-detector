@@ -35,11 +35,12 @@ import pysam
 # search window 7B89
 # chr2:215,390,931-215,395,491
 
+# search window 11Q12
+# chr2:215,378,835-215,382,551
+
 # SV 24->26 read: A00379:269:HGTK3DSXY:3:2208:30255:24330
 # SV 24->25 read: A00379:263:HGNF2DSXY:4:2229:14552:2300
 
-# not sure for statistics?
-# SV 25->26 read: A00379:269:HGTK3DSXY:3:2362:2013:3505
 
 
 

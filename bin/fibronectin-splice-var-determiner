@@ -74,7 +74,14 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
               "7B89: sv reads [24 -> 25]" + dataset_suffix + "\t" +
               "7B89: sv reads [25 -> 26]" + dataset_suffix + "\t" +
               "7B89: sv reads [24 -> 25 -> 26]" + dataset_suffix + "\t" +
-              "7B89: discrepant reads")
+              "7B89: discrepant reads" + "\t"
+              
+              
+              "11A12: wt reads [24 -> 26]" + dataset_suffix + "\t" +
+              "11A12: sv reads [24 -> 25]" + dataset_suffix + "\t" +
+              "11A12: sv reads [25 -> 26]" + dataset_suffix + "\t" +
+              "11A12: sv reads [24 -> 25 -> 26]" + dataset_suffix + "\t" +
+              "11A12: discrepant reads" )
     
     for _ in tqdm(input_bam):
         if not spliced_reads_only:
@@ -89,12 +96,23 @@ def CLI(reference_build, spliced_reads_only, read_names, input_bam, include_inte
                 for readname in sorted(stats_7B89[key]):
                     print(_ + "\t" + readname + "\t" + key)
 
+            for key in sorted(stats_11A12.keys()):
+                for readname in sorted(stats_11A12[key]):
+                    print(_ + "\t" + readname + "\t" + key)
+
+
         else:
             print(_ + "\t" + str(len(stats_7B89['7B89: wt read [24 -> 26]'])) + "\t" +
                              str(len(stats_7B89['7B89: sv read [24 -> 25]'])) + "\t" +
                              str(len(stats_7B89['7B89: sv read [25 -> 26]'])) + "\t" +
                              str(len(stats_7B89['7B89: sv read [24 -> 25 -> 26]'])) + "\t" +
-                             str(len(stats_7B89['7B89: discrepant read']))
+                             str(len(stats_7B89['7B89: discrepant read'])) + "\t" +
+                             
+                             str(len(stats_11A12['11A12: wt read [31 -> 33]'])) + "\t" +
+                             str(len(stats_11A12['11A12: sv read [31 -> 32]'])) + "\t" +
+                             str(len(stats_11A12['11A12: sv read [32 -> 33]'])) + "\t" +
+                             str(len(stats_11A12['11A12: sv read [31 -> 32 -> 33]'])) + "\t" +
+                             str(len(stats_11A12['11A12: discrepant read']))
                             )
     
     return True
