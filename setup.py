@@ -51,7 +51,7 @@ setup(name="fibronectin-splice-var-determiner",
       description="Free open-source tool to extract counts of splice variants of FN1",
       author=fn1splicevardeterminer.__author__,
       url=fn1splicevardeterminer.__homepage__,
-      keywords=["rna-seq", "egfr", "vIII"],
+      keywords=["rna-seq", "fibronectin", "FN1"],
       classifiers=[
           'Environment :: Console',
           'Intended Audience :: Science/Research',
