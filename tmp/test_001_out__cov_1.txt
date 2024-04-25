@@ -1,6 +1,0 @@
-sample	read-name	wt/splice-variant-status
-tests/data/test_001.bam	discrepant_read	sv 7B89 [24 -> 25 -> 26]
-tests/data/test_001.bam	e24_to_25_and_e25_to_e26_splice_variant_read	sv 7B89 [24 -> 25 -> 26]
-tests/data/test_001.bam	e24_to_e25_splice_variant_read	sv 7B89 [24 -> 25]
-tests/data/test_001.bam	e25_to_e26_splice_variant_read	sv 7B89 [25 -> 26]
-tests/data/test_001.bam	wiltype_read	wt [24 -> 26]

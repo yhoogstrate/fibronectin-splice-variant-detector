@@ -47,9 +47,13 @@ import pysam
 fn1_exons = { # fibronectin
   # 'hg19': { },
   'hg38': {
-    "24": ['chr2', 215394527, 215394719, "-"], # ex-24 
-    "25": ['chr2', 215392930, 215393203, "-"], # ex-25: SB79 & strand = neg
-    "26": ['chr2', 215391631, 215391814, "-"]  # ex-26
+    "24": ['chr2', 215394528, 215394719, "-"], # ex-24 
+    "25": ['chr2', 215392931, 215393203, "-"], # ex-25: SB79 & strand = neg
+    "26": ['chr2', 215391632, 215391814, "-"], # ex-26
+ 
+    "31": ["chr2", 215382211, 215382326, "-"], # ex-31
+    "32": ["chr2", 215380810, 215381076, "-"], # ex-32: 11A12
+    "33": ["chr2", 215379129, 215379317, "-"]  # ex-33
     }
 }
 
@@ -128,7 +132,6 @@ def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates)
     splice_right_intron = readnames['24'].intersection(readnames['25']).difference(readnames['26'])
     splice_left_intron = readnames['25'].intersection(readnames['26']).difference(readnames['24'])
     splice_both_introns = readnames['24'].intersection(readnames['25'], readnames['26'])
-    print(readnames)
     
 
     return {'wt [24 -> 26]': wt,
@@ -155,7 +158,7 @@ def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal, includ
             if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
                 if include_duplicates or (not read.is_duplicate):
                     for sj in get_splice_junction_positions(read):
-                        if sj[0] != None and sj[1] == (exons['24'][1]+1):
+                        if sj[0] != None and sj[1] == (exons['24'][1]):
                             
                             if sj[0] == exons['25'][2]:
                                 set_sv1.add(read.query_name)
@@ -171,7 +174,7 @@ def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal, includ
             if include_interchromosomal or (not read.is_paired or (read.is_paired and read.next_reference_name in list(set([_[0] for _ in exons.values()])))):
                 if include_duplicates or (not read.is_duplicate):
                     for sj in get_splice_junction_positions(read):
-                        if sj[0] != None and sj[1] == (exons['25'][1]+1) and sj[0] == exons['26'][2]:
+                        if sj[0] != None and sj[1] == (exons['25'][1]) and sj[0] == exons['26'][2]:
                             set_sv2.add(read.query_name)
                             break
 
