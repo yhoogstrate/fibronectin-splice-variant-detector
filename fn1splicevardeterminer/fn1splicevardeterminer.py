@@ -107,9 +107,7 @@ def get_splice_junction_positions(alignedsegment):
     return out
 
 
-#wt=['2','3','4','5','6','7']
-#viii=['8','9','10']
-def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates):
+def extract_FN1_SB79_sv_reads(bam, exons, include_interchromosomal, include_duplicates):
     #t = {'24': {'A->B->C', 'A->B', 'A->C'}, '25': {'A->B->C', 'A->B', 'B->C'}, '26': {'A->B->C', 'A->C', 'B->C'}}
     
     readnames = {}
@@ -141,7 +139,7 @@ def extract_viii_reads(bam, exons, include_interchromosomal, include_duplicates)
             'discrepancies': set([])} # this does not test for discrepancies
 
 
-def extract_viii_reads_based_on_sjs(bam, exons, include_interchromosomal, include_duplicates):
+def extract_FN1_SB79_sv_reads_based_on_sjs(bam, exons, include_interchromosomal, include_duplicates):
     set_wt = set()# readnames of those that splice from exon 24 to 26
     set_sv1 = set()# readnames of those that splice from exon 24 to 25
     set_sv2 = set()# readnames of those that splice from exon 25 to 26

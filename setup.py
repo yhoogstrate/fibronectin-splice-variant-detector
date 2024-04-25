@@ -2,11 +2,10 @@
 # *- coding: utf-8 -*-
 # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 textwidth=79:
 
-
 """[License: GNU General Public License v3 (GPLv3)]
 
-    EGFR vIII determiner: counts vIII / non-vIII spliced reads in BAM files
-    Copyright (C) 2024  Youri Hoogstrate
+    fibronectin-splice-variant-detector: counts Fibronectin (FN1) alt. splicing in BAM files
+    Copyright (C) 2024  Youri Hoogstrate, Tobias Weiss and Pim French
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

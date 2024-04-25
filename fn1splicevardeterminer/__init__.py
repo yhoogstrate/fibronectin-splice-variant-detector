@@ -22,7 +22,7 @@
 
 
     You can contact me via the github repository at the following url:
-    <https://github.com/yhoogstrate/fibronectin-splice-variant-detector>
+    <https://github.com/yhoogstrate/fibronectin-splice-var-determiner>
 
     You can e-mail me via 'y.hoogstrate' at the following webmail domain:
     gmail dot com
